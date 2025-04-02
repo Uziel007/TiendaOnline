@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Celtic Garamond", serif; text-align: center; background-color: #f4f4f4; }
+
+        .favoritos-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .favorito {
+            width: 250px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .favorito img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            z-index: 2;
+        }
+        .favorito h3 {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .favorito p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .boton-modificar, .boton-quitar, .boton-comprar, .boton-comprar-todo {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .boton-quitar {
+            background-color: #f44336;
+        }
+        .boton-comprar {
+            background-color: #25D366; /* Color verde de WhatsApp */
+            margin-top: 10px;
+        }
+        .boton-comprar-todo {
+            background-color: #128C7E; /* Verde WhatsApp más oscuro */
+            margin: 20px auto;
+            max-width: 300px;
+            font-weight: bold;
+        }
+        .boton-modificar:hover, .boton-quitar:hover, .boton-comprar:hover, .boton-comprar-todo:hover {
+            opacity: 0.8;
+        }
+
+        .modificar-cantidad {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modificar-cantidad input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+        }
+        
+        .select-talla {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .color-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .color-circulo {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid #ddd;
+        }
+        
+        .color-nombre {
+            font-size: 0.9rem;
+        }
+        
+        .hidden-link {
+            display: none;
+        }
+        
+        .icono {
+            font-size: 1.2rem;
+        }
+        
+        .total-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Mis Favoritos</h1>
+<div class="favoritos-container" id="favoritos-container"></div>
+
+<div class="total-container" id="total-container" style="display: none;">
+    <h3>Total de tu pedido: <span id="total-pedido">$0.00</span></h3>
+</div>
+
+<button class="boton-comprar-todo" id="comprar-todo">
+    <span class="icono">📦</span> Comprar todo por WhatsApp
+</button>
+
+<a href="#" id="whatsapp-link" class="hidden-link"></a>
+<a href="#" id="whatsapp-link-todo" class="hidden-link"></a>
+
+<script type="module">
+    // Mapeo de colores hexadecimales a nombres
+    const colorMap = {
+        '#FF0000': 'Rojo', '#8B0000': 'Rojo oscuro', '#CC0000': 'Rojo vivo',
+        '#000000': 'Negro', '#1E90FF': 'Azul dodger', '#87CEFA': 'Azul cielo',
+        '#4682B4': 'Azul acero', '#FFFFFF': 'Blanco', '#A389D8': 'Lavanda',
+        '#708090': 'Pizarra', '#2F4F4F': 'Pizarra oscuro', '#b78e81': 'Siena tostado',
+        '#FFD700': 'Oro', '#A0522D': 'Siena', '#D2B48C': 'Bronceado',
+        '#0000FF': 'Azul', '#1E90FF': 'Azul dodger', '#00008B': 'Azul oscuro',
+        '#4169E1': 'Azul real', '#191970': 'Azul medianoche', '#808080': 'Gris',
+        '#C0C0C0': 'Plata', '#FF00FF': 'Magenta', '#FFFF00': 'Amarillo',
+        '#00FF00': 'Verde lima', '#FF4500': 'Naranja rojizo', '#FF69B4': 'Rosa caliente',
+        '#DB7093': 'Rosa pálido', '#FF1493': 'Rosa profundo', '#FFC0CB': 'Rosa',
+        '#0066CC': 'Azul azur', '#00008B': 'Azul oscuro', '#1E90FF': 'Azul dodger',
+        '#87CEEB': 'Azul cielo claro', '#8B4513': 'Marrón cuero', '#D2691E': 'Chocolate',
+        '#CD853F': 'Peru', '#006400': 'Verde oscuro', '#556B2F': 'Oliva oscuro',
+        '#2E8B57': 'Verde mar', '#8FBC8F': 'Verde oscuro medio', '#B0B0B0': 'Gris claro',
+        '#FFA500': 'Naranja', '#800000': 'Granate', '#555555': 'Gris oscuro',
+        '#333333': 'Gris muy oscuro', '#666666': 'Gris medio', '#999999': 'Gris claro',
+    };
+
+    // Función para obtener el nombre del color
+    function getColorName(hexColor) {
+        return colorMap[hexColor.toUpperCase()] || hexColor;
+    }
+
+    // Función para mostrar los productos favoritos desde localStorage
+    function mostrarFavoritos() {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+        const contenedor = document.getElementById("favoritos-container");
+        const totalContainer = document.getElementById("total-container");
+        contenedor.innerHTML = "";
+
+        if (favoritos.length === 0) {
+            contenedor.innerHTML = "<p>No tienes productos en favoritos</p>";
+            totalContainer.style.display = "none";
+            document.getElementById("comprar-todo").style.display = "none";
+            return;
+        }
+
+        // Mostrar contenedor de total y botón de comprar todo
+        totalContainer.style.display = "block";
+        document.getElementById("comprar-todo").style.display = "flex";
+
+        let totalPedido = 0;
+
+        favoritos.forEach((favorito, index) => {
+            const div = document.createElement("div");
+            div.classList.add("favorito");
+            div.dataset.index = index;
+
+            // Calcular subtotal
+            const subtotal = parseFloat(favorito.precio) * parseInt(favorito.cantidad);
+            totalPedido += subtotal;
+
+            // Obtener nombre del color
+            const colorNombre = favorito.color ? getColorName(favorito.color) : 'No especificado';
+
+            div.innerHTML = `
+                <img src="${favorito.image}" alt="${favorito.nombre}">
+                <h3>${favorito.nombre}</h3>
+                <p>💰 Precio: $${favorito.precio}</p>
+                <p>🛒 Subtotal: $${subtotal.toFixed(2)}</p>
+                <div class="modificar-cantidad">
+                    <div>
+                        <label>📏 Cantidad:</label>
+                        <input type="number" value="${favorito.cantidad}" min="1" class="cantidad-input">
+                    </div>
+                    <div>
+                        <label>📐 Talla:</label>
+                        <select class="select-talla">
+                            ${['S', 'M', 'L', 'XL'].map(t => 
+                                `<option value="${t}" ${favorito.talla === t ? 'selected' : ''}>${t}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="color-container">
+                        <span class="color-nombre">🎨 Color: ${colorNombre}</span>
+                        <span class="color-circulo" style="background-color:${favorito.color || '#ccc'};"></span>
+                    </div>
+                </div>
+                <button class="boton-modificar">✏️ Guardar cambios</button>
+                <button class="boton-comprar">💬 Comprar por WhatsApp</button>
+                <button class="boton-quitar">🗑️ Quitar de favoritos</button>
+            `;
+
+            contenedor.appendChild(div);
+        });
+
+        // Actualizar total del pedido
+        document.getElementById("total-pedido").textContent = `$${totalPedido.toFixed(2)}`;
+    }
+
+    // Función para quitar producto de favoritos
+    function quitarFavorito(index) {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+        favoritos.splice(index, 1);
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        mostrarFavoritos();
+        alert("Producto eliminado de favoritos");
+    }
+
+    // Función para modificar el producto en favoritos
+    function modificarFavorito(index, nuevaCantidad, nuevaTalla) {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+        
+        if (index >= 0 && index < favoritos.length) {
+            favoritos[index].cantidad = nuevaCantidad;
+            favoritos[index].talla = nuevaTalla;
+            localStorage.setItem('favoritos', JSON.stringify(favoritos));
+            mostrarFavoritos();
+            alert("Cambios guardados correctamente");
+        }
+    }
+
+    // Función para enviar mensaje por WhatsApp con un producto
+    function comprarPorWhatsApp(index) {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+        const producto = favoritos[index];
+        
+        if (!producto) return;
+        
+        // Calcular total
+        const total = parseFloat(producto.precio) * parseInt(producto.cantidad);
+        
+        // Obtener nombre del color
+        const colorNombre = producto.color ? getColorName(producto.color) : 'No especificado';
+        
+        // Crear mensaje con enlace a la imagen
+        const mensaje = `¡Hola! Estoy interesado en comprar este producto:
+        
+📌 *Producto:* ${producto.nombre}
+💰 *Precio unitario:* $${producto.precio}
+🎨 *Color:* ${colorNombre}
+📏 *Talla:* ${producto.talla || 'No especificada'}
+🛒 *Cantidad:* ${producto.cantidad}
+💵 *Total:* $${total.toFixed(2)}
+📸 *Ver imagen:* ${producto.image}
+
+Por favor, confírmame disponibilidad y forma de pago. ¡Gracias!`;
+        
+        // Codificar mensaje para URL
+        const mensajeCodificado = encodeURIComponent(mensaje);
+        
+        // Abrir WhatsApp
+        const whatsappLink = document.getElementById('whatsapp-link');
+        whatsappLink.href = `https://wa.me/525585067049?text=${mensajeCodificado}`;
+        whatsappLink.click();
+    }
+
+    // Función para enviar todos los productos por WhatsApp
+    function comprarTodoPorWhatsApp() {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+        
+        if (favoritos.length === 0) {
+            alert("No tienes productos en favoritos");
+            return;
+        }
+
+        let mensaje = "¡Hola! Estoy interesado en comprar los siguientes productos:\n\n";
+        let totalGeneral = 0;
+        
+        favoritos.forEach((producto, index) => {
+            // Calcular total por producto
+            const total = parseFloat(producto.precio) * parseInt(producto.cantidad);
+            totalGeneral += total;
+            
+            // Obtener nombre del color
+            const colorNombre = producto.color ? getColorName(producto.color) : 'No especificado';
+            
+            mensaje += `➡️ *Producto ${index + 1}:* ${producto.nombre}
+💰 *Precio:* $${producto.precio} (x${producto.cantidad}) = $${total.toFixed(2)}
+🎨 *Color:* ${colorNombre}
+📏 *Talla:* ${producto.talla || 'No especificada'}
+📸 *Imagen:* ${producto.image}\n\n`;
+        });
+        
+        mensaje += `--------------------------------\n`;
+        mensaje += `💰 *TOTAL GENERAL:* $${totalGeneral.toFixed(2)}\n\n`;
+        mensaje += `Por favor, confírmame disponibilidad y forma de pago. ¡Gracias!`;
+        
+        // Codificar mensaje para URL
+        const mensajeCodificado = encodeURIComponent(mensaje);
+        
+        // Abrir WhatsApp
+        const whatsappLink = document.getElementById('whatsapp-link-todo');
+        whatsappLink.href = `https://wa.me/525585067049?text=${mensajeCodificado}`;
+        whatsappLink.click();
+    }
+
+    // Eventos del DOM
+    document.addEventListener("DOMContentLoaded", () => {
+        mostrarFavoritos();
+
+        document.getElementById("favoritos-container").addEventListener("click", (event) => {
+            const favoritoDiv = event.target.closest('.favorito');
+            if (!favoritoDiv) return;
+            
+            const index = parseInt(favoritoDiv.dataset.index);
+            
+            if (event.target.classList.contains('boton-quitar')) {
+                if (confirm("¿Estás seguro de que quieres eliminar este producto de favoritos?")) {
+                    quitarFavorito(index);
+                }
+            }
+            
+            if (event.target.classList.contains('boton-modificar')) {
+                const cantidadInput = favoritoDiv.querySelector('.cantidad-input');
+                const tallaSelect = favoritoDiv.querySelector('.select-talla');
+                const nuevaCantidad = parseInt(cantidadInput.value);
+                const nuevaTalla = tallaSelect.value;
+                modificarFavorito(index, nuevaCantidad, nuevaTalla);
+            }
+            
+            if (event.target.classList.contains('boton-comprar')) {
+                comprarPorWhatsApp(index);
+            }
+        });
+
+        // Evento para comprar todo
+        document.getElementById("comprar-todo").addEventListener("click", comprarTodoPorWhatsApp);
+    });
+</script>
+
+</body>
+</html>

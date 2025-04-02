@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Producto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-size: cover;
+        }
+
+        .producto-container {
+            display: flex;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .imagen-container {
+            flex: 1;
+        }
+
+        .imagen-container img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .info-container {
+            flex: 1;
+            padding-left: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .opciones label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        #colores-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .color-circulo {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-circulo.selected {
+            border: 2px solid black;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #favoritos-btn {
+            background: #ff4081;
+            color: white;
+        }
+
+        #agregar-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .error-mensaje {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .requerido::after {
+            content: " *";
+            color: #f44336;
+        }
+    </style>    
+</head>
+<body id="body">
+
+    <div class="producto-container">
+        <div class="imagen-container">
+            <img id="producto-imagen" src="" alt="Producto">
+        </div>
+        <div class="info-container">
+            <h1 id="producto-nombre"></h1>
+            <p id="producto-descripcion"></p>
+            <p><strong>Precio:</strong> $<span id="producto-precio"></span></p>
+
+            <div class="opciones">
+                <label for="color" class="requerido">Color:</label>
+                <div id="colores-container"></div>
+                <div id="color-error" class="error-mensaje">Por favor selecciona un color</div>
+
+                <label for="medida">Medida:</label>
+                <select id="medida"></select>
+
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" min="1" value="1">
+            </div>
+
+            <button id="favoritos-btn">Agregar a Favoritos</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
+        const supabaseUrl = "https://stasakmcnscgdqphhsou.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0YXNha21jbnNjZ2RxcGhoc291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NjI4NzUsImV4cCI6MjA1OTAzODg3NX0.slsteyy0PHxuMzc0k0OL6EZmca-twQKymNs0rp000Vo";
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Variable para rastrear el color seleccionado
+        let colorSeleccionado = null;
+
+        async function obtenerProducto() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productoId = urlParams.get('id');
+
+            let { data: producto, error } = await supabase
+                .from('productos')
+                .select('*, colaboracion_productos(colaboraciones(fondo))')
+                .eq('id', productoId)
+                .single();
+
+            if (error || !producto) {
+                console.error("Error al obtener producto:", error);
+                return;
+            }
+
+            document.getElementById("producto-imagen").src = producto.image;
+            document.getElementById("producto-nombre").textContent = producto.nombre;
+            document.getElementById("producto-descripcion").textContent = producto.descripcion;
+            document.getElementById("producto-precio").textContent = producto.precio;
+
+            // Fondos de colaboraciones
+            if (producto.colaboracion_productos.length > 0) {
+                document.getElementById("body").style.backgroundImage = `url(${producto.colaboracion_productos[0].colaboraciones.fondo})`;
+            }
+
+            // Mostrar colores
+            const coloresContainer = document.getElementById("colores-container");
+            const colores = producto.colores.split(', ');
+            coloresContainer.innerHTML = "";
+            colores.forEach(color => {
+                let colorCirculo = document.createElement("div");
+                colorCirculo.classList.add("color-circulo");
+                colorCirculo.style.backgroundColor = color;
+                colorCirculo.dataset.color = color;
+                colorCirculo.onclick = () => {
+                    document.querySelectorAll(".color-circulo").forEach(c => c.classList.remove("selected"));
+                    colorCirculo.classList.add("selected");
+                    colorSeleccionado = color;
+                    document.getElementById("color-error").style.display = "none";
+                };
+                coloresContainer.appendChild(colorCirculo);
+            });
+
+            // Mostrar medidas
+            const medidaSelect = document.getElementById("medida");
+            const medidas = producto.medidas.split(', ');
+            medidas.forEach(medida => {
+                let option = document.createElement("option");
+                option.value = medida;
+                option.textContent = medida;
+                medidaSelect.appendChild(option);
+            });
+
+            // Incrementar vistas
+            await supabase
+                .from('productos')
+                .update({ vistas: producto.vistas + 1 })
+                .eq('id', productoId);
+        }
+
+        document.getElementById("favoritos-btn").addEventListener("click", () => {
+            const medidaSeleccionada = document.getElementById("medida").value;
+            const cantidad = document.getElementById("cantidad").value;
+
+            // Validar que se haya seleccionado un color
+            if (!colorSeleccionado) {
+                document.getElementById("color-error").style.display = "block";
+                return;
+            }
+
+            const favorito = {
+                id: new URLSearchParams(window.location.search).get('id'),
+                nombre: document.getElementById("producto-nombre").textContent,
+                precio: document.getElementById("producto-precio").textContent,
+                image: document.getElementById("producto-imagen").src,
+                color: colorSeleccionado,
+                talla: medidaSeleccionada,
+                cantidad: cantidad,
+            };
+
+            // Obtener los favoritos actuales o crear un nuevo array si no existen
+            const favoritosActuales = JSON.parse(localStorage.getItem('favoritos')) || [];
+            
+            // Verificar si el producto ya está en favoritos
+            const existe = favoritosActuales.some(item => item.id === favorito.id);
+            
+            if (!existe) {
+                favoritosActuales.push(favorito);
+                localStorage.setItem('favoritos', JSON.stringify(favoritosActuales));
+                alert("Producto agregado a favoritos");
+            } else {
+                alert("Este producto ya está en tus favoritos");
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", obtenerProducto);
+    </script>
+
+</body>
+</html>

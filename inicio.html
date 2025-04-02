@@ -147,7 +147,7 @@
                 .from('colaboracion_productos')
                 .select(`
                     prenda_id, 
-                    productos ( id, nombre, precio, image ), 
+                    productos ( id, nombre, precio, image, vistas ), 
                     colaboraciones ( id, nombre_colaboracion, fondo )
                 `);
     
@@ -180,6 +180,10 @@
             productosSinColaboracion.forEach(producto => {
                 let div = document.createElement("div");
                 div.classList.add("producto");
+                div.dataset.id = producto.id;
+                div.dataset.nombre = producto.nombre;
+                div.dataset.precio = producto.precio;
+                div.dataset.image = producto.image;
                 div.innerHTML = `
                     <img src="${producto.image}" alt="${producto.nombre}">
                     <h3>${producto.nombre}</h3>
@@ -193,12 +197,14 @@
                 let colaboracion = item.colaboraciones;
                 let div = document.createElement("div");
                 div.classList.add("producto");
+                div.dataset.id = producto.id;
+                div.dataset.nombre = producto.nombre;
+                div.dataset.precio = producto.precio;
+                div.dataset.image = producto.image;
                 if (colaboracion) {
                     div.style.backgroundImage = `url(${colaboracion.fondo})`;
-                    div.style.backgroundSize = "cover";
-                    div.style.padding = "20px";
-                    div.innerHTML = `
-                        <p style="background: rgba(0, 0, 0, 0.6); color: white; padding: 5px; border-radius: 5px;">
+                    div.innerHTML += `
+                        <p class="colaboracion-texto">
                             Colaboración con: ${colaboracion.nombre_colaboracion}
                         </p>
                     `;
@@ -210,11 +216,55 @@
                 `;
                 contenedor.appendChild(div);
             });
+    
+            agregarEventoClickProductos();
+        }
+    
+        function agregarEventoClickProductos() {
+            const contenedor = document.getElementById("productos-container");
+    
+            contenedor.addEventListener("click", async (e) => {
+                let producto = e.target.closest(".producto");
+                if (producto) {
+                    let productoId = producto.dataset.id;
+    
+                    // Incrementar la cantidad de vistas en Supabase
+                    await incrementarVistas(productoId);
+    
+                    // Redirigir a producto.html con el ID del producto
+                    window.location.href = `producto.html?id=${productoId}`;
+                }
+            });
+        }
+    
+        async function incrementarVistas(productoId) {
+            let { data, error } = await supabase
+                .from('productos')
+                .select('vistas')
+                .eq('id', productoId)
+                .single();
+    
+            if (error) {
+                console.error("Error al obtener vistas del producto:", error);
+                return;
+            }
+    
+            let nuevasVistas = (data.vistas || 0) + 1;
+    
+            let { error: updateError } = await supabase
+                .from('productos')
+                .update({ vistas: nuevasVistas })
+                .eq('id', productoId);
+    
+            if (updateError) {
+                console.error("Error al actualizar vistas:", updateError);
+            } else {
+                console.log(`Vistas actualizadas para producto ${productoId}: ${nuevasVistas}`);
+            }
         }
     
         document.addEventListener("DOMContentLoaded", obtenerProductos);
-    </script>
-    
+    </script>    
 
 </body>
 </html>
