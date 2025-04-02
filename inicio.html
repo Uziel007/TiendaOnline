@@ -8,8 +8,47 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Celtic Garamond", serif; text-align: center; background-color: #f4f4f4; }
 
-        /* Estilos del menú */
-        nav {
+        /* Contenedor de productos */
+        .productos-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .producto {
+            width: 220px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .producto img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            z-index: 2;
+        }
+        .colaboracion-texto {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px;
+            border-radius: 5px;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+               /* Estilos del menú */
+               nav {
             background-color: #222;
             padding: 15px;
             position: relative;
@@ -35,35 +74,17 @@
             border-radius: 5px;
         }
 
-        /* Contenedor de productos */
-        .productos-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
-        .producto {
-            width: 200px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        .producto img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .producto h3 {
-            font-size: 1.2rem;
-            margin: 10px 0;
-        }
-        .producto p {
-            font-size: 1rem;
-            color: #333;
+        /* Botón de menú en móvil */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 20px;
         }
 
         /* Responsive */
@@ -84,14 +105,6 @@
             }
             .menu-toggle {
                 display: block;
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: white;
-                cursor: pointer;
-                position: absolute;
-                top: 15px;
-                right: 20px;
             }
             .menu.show {
                 display: flex;
@@ -100,7 +113,6 @@
     </style>
 </head>
 <body>
-
     <nav>
         <button class="menu-toggle">☰</button>
         <ul class="menu">
@@ -120,26 +132,52 @@
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
+    
         const supabaseUrl = "https://stasakmcnscgdqphhsou.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0YXNha21jbnNjZ2RxcGhoc291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NjI4NzUsImV4cCI6MjA1OTAzODg3NX0.slsteyy0PHxuMzc0k0OL6EZmca-twQKymNs0rp000Vo";
         const supabase = createClient(supabaseUrl, supabaseKey);
-
+    
         async function obtenerProductos() {
-            let { data, error } = await supabase.from('productos').select('*');
-            if (error) {
-                console.error("Error al obtener productos:", error);
+            let { data: productosSinColaboracion, error: error1 } = await supabase
+                .from('productos')
+                .select('*')
+                .not('id', 'in', `(${await obtenerProductosConColaboracionIds()})`);
+            
+            let { data: productosConColaboracion, error: error2 } = await supabase
+                .from('colaboracion_productos')
+                .select(`
+                    prenda_id, 
+                    productos ( id, nombre, precio, image ), 
+                    colaboraciones ( id, nombre_colaboracion, fondo )
+                `);
+    
+            if (error1 || error2) {
+                console.error("Error al obtener productos:", error1 || error2);
             } else {
-                console.log("Productos obtenidos:", data);
-                mostrarProductos(data);
+                console.log("Productos obtenidos sin colaboración:", productosSinColaboracion);
+                console.log("Productos obtenidos con colaboraciones:", productosConColaboracion);
+                mostrarProductos(productosSinColaboracion, productosConColaboracion);
             }
         }
-
-
-        function mostrarProductos(productos) {
+    
+        async function obtenerProductosConColaboracionIds() {
+            let { data, error } = await supabase
+                .from('colaboracion_productos')
+                .select('prenda_id');
+            
+            if (error) {
+                console.error("Error al obtener productos con colaboración:", error);
+                return '';
+            }
+            
+            return data.map(item => item.prenda_id).join(',');
+        }
+    
+        function mostrarProductos(productosSinColaboracion, productosConColaboracion) {
             const contenedor = document.getElementById("productos-container");
             contenedor.innerHTML = "";
-            productos.forEach(producto => {
+            
+            productosSinColaboracion.forEach(producto => {
                 let div = document.createElement("div");
                 div.classList.add("producto");
                 div.innerHTML = `
@@ -149,20 +187,34 @@
                 `;
                 contenedor.appendChild(div);
             });
+    
+            productosConColaboracion.forEach(item => {
+                let producto = item.productos;
+                let colaboracion = item.colaboraciones;
+                let div = document.createElement("div");
+                div.classList.add("producto");
+                if (colaboracion) {
+                    div.style.backgroundImage = `url(${colaboracion.fondo})`;
+                    div.style.backgroundSize = "cover";
+                    div.style.padding = "20px";
+                    div.innerHTML = `
+                        <p style="background: rgba(0, 0, 0, 0.6); color: white; padding: 5px; border-radius: 5px;">
+                            Colaboración con: ${colaboracion.nombre_colaboracion}
+                        </p>
+                    `;
+                }
+                div.innerHTML += `
+                    <img src="${producto.image}" alt="${producto.nombre}">
+                    <h3>${producto.nombre}</h3>
+                    <p>Precio: $${producto.precio}</p>
+                `;
+                contenedor.appendChild(div);
+            });
         }
-
+    
         document.addEventListener("DOMContentLoaded", obtenerProductos);
     </script>
-
-    <script>
-        // Menú móvil
-        const toggle = document.querySelector(".menu-toggle");
-        const menu = document.querySelector(".menu");
-
-        toggle.addEventListener("click", () => {
-            menu.classList.toggle("show");
-        });
-    </script>
+    
 
 </body>
 </html>
