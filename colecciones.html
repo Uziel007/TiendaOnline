@@ -15,6 +15,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative; /* Necesario para el botón flotante */
         }
         
         /* NAVEGACIÓN ESTANDARIZADA */
@@ -165,6 +166,51 @@
             background: rgba(0, 0, 0, 0.9);
         }
 
+        /* BOTÓN FLOTANTE DEL CARRITO */
+        .carrito-flotante {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #060606;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .carrito-flotante:hover {
+            background-color: #34495e;
+            transform: scale(1.1);
+        }
+
+        .carrito-flotante i {
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Contador de items (opcional) */
+        .carrito-contador {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         /* RESPONSIVE - DISEÑO PARA MÓVIL */
         @media (max-width: 768px) {
             .menu {
@@ -204,8 +250,28 @@
                 padding: 4px 8px;
                 font-size: 13px;
             }
+
+            /* Ajustes para el botón flotante en móvil */
+            .carrito-flotante {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .carrito-flotante i {
+                font-size: 20px;
+            }
+
+            .carrito-contador {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
         }
     </style>
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- NAVEGACIÓN ESTANDARIZADA -->
@@ -226,6 +292,13 @@
 
     <div class="otras-temporadas" id="otras-temporadas"></div>
 
+    <!-- BOTÓN FLOTANTE DEL CARRITO -->
+    <div class="carrito-flotante" onclick="window.location.href='favoritos.html'">
+        <i class="fas fa-shopping-cart"></i>
+        <!-- Contador opcional (puedes implementar la lógica para actualizarlo) -->
+        <div class="carrito-contador" id="carrito-contador">0</div>
+    </div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -235,6 +308,12 @@
 
         // Variable para controlar el click
         let clickEnProgreso = false;
+
+        // Función para actualizar el contador del carrito
+        function actualizarContadorCarrito() {
+            const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+            document.getElementById('carrito-contador').textContent = favoritos.length;
+        }
 
         async function obtenerProductosPorTemporada(temporada) {
             let { data: productos, error } = await supabase
@@ -359,6 +438,9 @@
                 contenedorSecundario.appendChild(generarHTMLTemporada(t));
                 mostrarProductos(t, `productos-${t.toLowerCase()}`);
             });
+
+            // Actualizar contador del carrito al cargar la página
+            actualizarContadorCarrito();
         });
     </script>
 </body>

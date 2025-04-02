@@ -15,6 +15,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative; /* Necesario para el botón flotante */
         }
         
         /* NAVEGACIÓN SIMPLIFICADA */
@@ -138,6 +139,51 @@
             display: inline-block;
         }
 
+        /* BOTÓN FLOTANTE DEL CARRITO */
+        .carrito-flotante {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .carrito-flotante:hover {
+            background-color: #34495e;
+            transform: scale(1.1);
+        }
+
+        .carrito-flotante i {
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Contador de items (opcional) */
+        .carrito-contador {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         /* RESPONSIVE - DISEÑO PARA MÓVIL */
         @media (max-width: 768px) {
             .menu {
@@ -167,8 +213,28 @@
                 width: 100px;
                 height: 100px;
             }
+
+            /* Ajustes para el botón flotante en móvil */
+            .carrito-flotante {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .carrito-flotante i {
+                font-size: 20px;
+            }
+
+            .carrito-contador {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
         }
     </style>
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- NAVEGACIÓN SIMPLIFICADA SIN BOTÓN HAMBURGUESA -->
@@ -187,12 +253,25 @@
     <h1>Colaboraciones</h1>
     <div id="colaboraciones-container"></div>
 
+    <!-- BOTÓN FLOTANTE DEL CARRITO -->
+    <div class="carrito-flotante" onclick="window.location.href='favoritos.html'">
+        <i class="fas fa-shopping-cart"></i>
+        <!-- Contador opcional (puedes implementar la lógica para actualizarlo) -->
+        <div class="carrito-contador" id="carrito-contador">0</div>
+    </div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         const supabaseUrl = "https://stasakmcnscgdqphhsou.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0YXNha21jbnNjZ2RxcGhoc291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0NjI4NzUsImV4cCI6MjA1OTAzODg3NX0.slsteyy0PHxuMzc0k0OL6EZmca-twQKymNs0rp000Vo";
         const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Función para actualizar el contador del carrito
+        function actualizarContadorCarrito() {
+            const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+            document.getElementById('carrito-contador').textContent = favoritos.length;
+        }
 
         async function obtenerColaboraciones() {
             let { data: colaboraciones, error } = await supabase.from('colaboraciones').select('*');
@@ -289,7 +368,6 @@
 
                 div.innerHTML = `
                     <h2>${colaboracion.nombre_colaboracion}</h2>
-                    <p>${colaboracion.descripcion || "Sin descripción"}</p>
                     <div class="productos-container">
                         ${productos.map(producto => `
                             <div class="producto" data-id="${producto.id}">
@@ -309,7 +387,10 @@
         }
 
         // Inicializar la página
-        document.addEventListener("DOMContentLoaded", obtenerColaboraciones);
+        document.addEventListener("DOMContentLoaded", () => {
+            obtenerColaboraciones();
+            actualizarContadorCarrito(); // Actualizar contador al cargar la página
+        });
     </script>
 </body>
 </html>
