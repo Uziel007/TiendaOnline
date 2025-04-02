@@ -26,6 +26,7 @@
             background-size: cover;
             background-position: center;
             position: relative;
+            overflow: hidden;
         }
         .producto img {
             width: 100%;
@@ -34,21 +35,43 @@
             border-radius: 10px;
             z-index: 2;
         }
+        
+        /* Contenedor de texto con fondo semitransparente */
+        .producto-texto {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: white;
+        }
+        
+        .producto h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .producto p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
         .colaboracion-texto {
             font-size: 0.9rem;
             font-weight: bold;
             color: white;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 5px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
+            white-space: nowrap;
         }
-               /* Estilos del menú */
-               nav {
+
+        /* Estilos del menú */
+        nav {
             background-color: #222;
             padding: 15px;
             position: relative;
@@ -108,6 +131,14 @@
             }
             .menu.show {
                 display: flex;
+            }
+            
+            .producto {
+                width: 160px;
+                padding: 10px;
+            }
+            .producto img {
+                height: 150px;
             }
         }
     </style>
@@ -186,8 +217,10 @@
                 div.dataset.image = producto.image;
                 div.innerHTML = `
                     <img src="${producto.image}" alt="${producto.nombre}">
-                    <h3>${producto.nombre}</h3>
-                    <p>Precio: $${producto.precio}</p>
+                    <div class="producto-texto">
+                        <h3>${producto.nombre}</h3>
+                        <p>Precio: $${producto.precio}</p>
+                    </div>
                 `;
                 contenedor.appendChild(div);
             });
@@ -201,18 +234,22 @@
                 div.dataset.nombre = producto.nombre;
                 div.dataset.precio = producto.precio;
                 div.dataset.image = producto.image;
+                
                 if (colaboracion) {
                     div.style.backgroundImage = `url(${colaboracion.fondo})`;
                     div.innerHTML += `
                         <p class="colaboracion-texto">
-                            Colaboración con: ${colaboracion.nombre_colaboracion}
+                            ${colaboracion.nombre_colaboracion}
                         </p>
                     `;
                 }
+                
                 div.innerHTML += `
                     <img src="${producto.image}" alt="${producto.nombre}">
-                    <h3>${producto.nombre}</h3>
-                    <p>Precio: $${producto.precio}</p>
+                    <div class="producto-texto">
+                        <h3>${producto.nombre}</h3>
+                        <p>Precio: $${producto.precio}</p>
+                    </div>
                 `;
                 contenedor.appendChild(div);
             });
@@ -265,6 +302,5 @@
     
         document.addEventListener("DOMContentLoaded", obtenerProductos);
     </script>    
-
 </body>
 </html>

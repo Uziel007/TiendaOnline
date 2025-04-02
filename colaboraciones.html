@@ -17,21 +17,44 @@
         }
         .colaboracion h2 { margin-bottom: 10px; }
         .colaboracion p { font-size: 14px; }
-        .productos-container { display: flex; flex-wrap: wrap; justify-content: center; }
+        .productos-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+        }
         .producto {
             display: inline-block;
             margin: 10px;
-            padding: 10px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
-            width: 150px;
+            width: 180px;
             text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .producto:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
         .producto img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             object-fit: cover;
             border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .producto h3 {
+            margin: 10px 0;
+            font-size: 16px;
+            color: white;
+        }
+        .producto p {
+            margin: 5px 0;
+            font-size: 14px;
         }
 
         nav {
@@ -60,8 +83,8 @@
             border-radius: 5px;
         }
 
-                /* Responsive */
-                @media (max-width: 768px) {
+        /* Responsive */
+        @media (max-width: 768px) {
             .menu {
                 flex-direction: column;
                 display: none;
@@ -89,6 +112,14 @@
             }
             .menu.show {
                 display: flex;
+            }
+            .producto {
+                width: 140px;
+                padding: 10px;
+            }
+            .producto img {
+                width: 100px;
+                height: 100px;
             }
         }
     </style>
@@ -153,6 +184,49 @@
             return detallesProductos;
         }
 
+        async function incrementarVistas(productoId) {
+            // Obtener las vistas actuales
+            let { data: producto, error } = await supabase
+                .from('productos')
+                .select('vistas')
+                .eq('id', productoId)
+                .single();
+
+            if (error) {
+                console.error("Error al obtener vistas del producto:", error);
+                return;
+            }
+
+            // Incrementar las vistas
+            let nuevasVistas = (producto.vistas || 0) + 1;
+
+            // Actualizar en la base de datos
+            let { error: updateError } = await supabase
+                .from('productos')
+                .update({ vistas: nuevasVistas })
+                .eq('id', productoId);
+
+            if (updateError) {
+                console.error("Error al actualizar vistas:", updateError);
+            } else {
+                console.log(`Vistas incrementadas para producto ${productoId}. Nuevo total: ${nuevasVistas}`);
+            }
+        }
+
+        function agregarEventosProductos() {
+            document.querySelectorAll('.producto').forEach(producto => {
+                producto.addEventListener('click', async function() {
+                    const productoId = this.dataset.id;
+                    
+                    // Incrementar vistas antes de redirigir
+                    await incrementarVistas(productoId);
+                    
+                    // Redirigir a la página del producto
+                    window.location.href = `producto.html?id=${productoId}`;
+                });
+            });
+        }
+
         async function mostrarColaboraciones(colaboraciones) {
             const contenedor = document.getElementById("colaboraciones-container");
             contenedor.innerHTML = "";
@@ -171,9 +245,9 @@
                     <p>${colaboracion.descripcion || "Sin descripción"}</p>
                     <div class="productos-container">
                         ${productos.map(producto => `
-                            <div class="producto">
+                            <div class="producto" data-id="${producto.id}">
                                 <img src="${producto.image}" alt="${producto.nombre}">
-                                <p>${producto.nombre}</p>
+                                <h3>${producto.nombre}</h3>
                                 <p>$${producto.precio}</p>
                             </div>
                         `).join("")}
@@ -182,10 +256,17 @@
 
                 contenedor.appendChild(div);
             }
+
+            // Agregar eventos a los productos después de mostrarlos
+            agregarEventosProductos();
         }
+
+        // Menú responsive
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.menu').classList.toggle('show');
+        });
 
         document.addEventListener("DOMContentLoaded", obtenerColaboraciones);
     </script>
-
 </body>
 </html>
