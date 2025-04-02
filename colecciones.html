@@ -5,7 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Colecciones</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f5f5f5; margin: 0; padding: 0; }
+        /* ESTILOS GENERALES */
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f5f5f5; 
+            margin: 0; 
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* NAVEGACIÓN ESTANDARIZADA */
+        nav { 
+            background-color: #222; 
+            padding: 15px;
+        }
+        
+        .menu { 
+            list-style: none; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .menu li { 
+            display: inline; 
+        }
+        
+        .menu a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .menu a:hover { 
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .menu a.active {
+            background-color: #444;
+            font-weight: bold;
+        }
+        
+        /* CONTENIDO PRINCIPAL */
         .colaboracion { 
             position: relative; 
             margin: 20px auto; 
@@ -16,6 +66,7 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        
         .productos-container { 
             display: flex; 
             flex-wrap: wrap; 
@@ -23,6 +74,7 @@
             gap: 15px;
             padding: 15px;
         }
+        
         .producto { 
             margin: 10px; 
             padding: 15px; 
@@ -35,10 +87,12 @@
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
+        
         .producto:hover {
             transform: translateY(-5px);
             background: rgba(0, 0, 0, 0.5);
         }
+        
         .producto img { 
             width: 120px; 
             height: 120px; 
@@ -46,6 +100,7 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
+        
         .producto h3 {
             margin: 10px 0;
             font-size: 16px;
@@ -55,6 +110,7 @@
             border-radius: 5px;
             display: inline-block;
         }
+        
         .producto p {
             margin: 5px 0;
             font-size: 14px;
@@ -103,56 +159,47 @@
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
         }
+        
         .ver-mas-btn:hover { 
             transform: scale(1.05);
             background: rgba(0, 0, 0, 0.9);
         }
 
-        /* Navegación */
-        nav { 
-            background-color: #222; 
-            padding: 15px;
-            position: relative;
-        }
-        .menu { 
-            list-style: none; 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px;
-            margin: 0;
-            padding: 0;
-        }
-        .menu li { display: inline; }
-        .menu a { 
-            color: white; 
-            text-decoration: none; 
-            padding: 10px; 
-            font-size: 1.1rem;
-            transition: background 0.3s;
-            border-radius: 5px;
-        }
-        .menu a:hover { 
-            background-color: rgba(255, 255, 255, 0.2); 
-        }
-
-        /* Responsive */
+        /* RESPONSIVE - DISEÑO PARA MÓVIL */
         @media (max-width: 768px) {
             .menu {
                 flex-direction: column;
-                gap: 10px;
+                align-items: center;
+                gap: 5px;
             }
+            
+            .menu li {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .menu a {
+                display: block;
+                width: 90%;
+                margin: 0 auto;
+                padding: 12px 0;
+            }
+            
             .producto {
                 width: 140px;
                 padding: 10px;
             }
+            
             .producto img {
                 width: 100px;
                 height: 100px;
             }
+            
             .colaboracion {
                 margin: 10px;
                 padding: 15px;
             }
+            
             .producto h3, .producto p {
                 padding: 4px 8px;
                 font-size: 13px;
@@ -161,10 +208,11 @@
     </style>
 </head>
 <body>
+    <!-- NAVEGACIÓN ESTANDARIZADA -->
     <nav>
         <ul class="menu">
             <li><a href="inicio.html">Inicio</a></li>
-            <li><a href="colecciones.html">Colecciones</a></li>
+            <li><a href="colecciones.html" class="active">Colecciones</a></li>
             <li><a href="tendencias.html">Tendencias</a></li>
             <li><a href="colaboraciones.html">Colaboraciones</a></li>
             <li><a href="lookbook.html">Lookbook</a></li>
