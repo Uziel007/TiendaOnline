@@ -134,7 +134,7 @@
         }
 
         .btn-submit {
-            background: #222;
+            background: #000000; /* Verde WhatsApp */
             color: white;
             border: none;
             padding: 12px 25px;
@@ -143,10 +143,15 @@
             font-size: 1rem;
             transition: background 0.3s;
             width: 100%;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-submit:hover {
-            background: #444;
+            background: #25D366; /* Verde WhatsApp oscuro */
         }
 
         /* INFO DE CONTACTO */
@@ -283,16 +288,10 @@
                 </div>
             </div>
             
-            <!-- FORMULARIO DE CONTACTO (MODIFICADO PARA FORMSUBMIT) -->
+            <!-- FORMULARIO DE CONTACTO MODIFICADO PARA WHATSAPP -->
             <div class="contacto-form">
                 <h2>Envíanos un mensaje</h2>
-                <form action="https://formsubmit.co/uzielsanchez007@gmail.com" method="POST">
-                    <!-- Configuración de FormSubmit -->
-                    <input type="hidden" name="_next" value="https://tupagina.com/gracias.html"> <!-- Reemplaza con tu URL -->
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_subject" value="Nuevo mensaje desde el sitio web">
-                    <input type="hidden" name="_template" value="table">
-                    
+                <form id="whatsappForm">
                     <div class="form-group">
                         <label for="nombre">Nombre completo:</label>
                         <input type="text" id="nombre" name="nombre" required>
@@ -312,11 +311,11 @@
                         <label for="asunto">Asunto:</label>
                         <select id="asunto" name="asunto" required>
                             <option value="" disabled selected>Selecciona un asunto</option>
-                            <option value="consulta">Consulta general</option>
-                            <option value="pedido">Información sobre pedidos</option>
-                            <option value="colaboracion">Oportunidades de colaboración</option>
-                            <option value="prensa">Prensa y medios</option>
-                            <option value="otro">Otro</option>
+                            <option value="Consulta general">Consulta general</option>
+                            <option value="Información sobre pedidos">Información sobre pedidos</option>
+                            <option value="Colaboración">Oportunidades de colaboración</option>
+                            <option value="Prensa">Prensa y medios</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
                     
@@ -325,10 +324,39 @@
                         <textarea id="mensaje" name="mensaje" required></textarea>
                     </div>
                     
-                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                    </button>
                 </form>
             </div>
         </div>
     </main>
+
+    <script>
+        document.getElementById('whatsappForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener datos del formulario
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const asunto = document.getElementById('asunto').value;
+            const mensaje = document.getElementById('mensaje').value;
+            
+            // Crear mensaje para WhatsApp
+            const textoWhatsApp = `*Nuevo mensaje de contacto*%0A%0A
+*Nombre:* ${nombre}%0A
+*Email:* ${email}%0A
+${telefono ? `*Teléfono:* ${telefono}%0A` : ''}
+*Asunto:* ${asunto}%0A
+*Mensaje:* ${mensaje}`;
+            
+            // Abrir WhatsApp con el mensaje predefinido
+            window.open(`https://wa.me/525585067049?text=${textoWhatsApp}`, '_blank');
+            
+            // Opcional: Resetear el formulario
+            this.reset();
+        });
+    </script>
 </body>
 </html>
