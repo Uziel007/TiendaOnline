@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Moda</title>
+    <style>
+        /* ESTILOS GENERALES */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVEGACIÓN */
+        nav { 
+            background-color: #222; 
+            padding: 15px;
+        }
+        
+        .menu { 
+            list-style: none; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .menu li { display: inline; }
+        
+        .menu a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .menu a:hover { background-color: #444; }
+        .menu a.active { background-color: #555; font-weight: bold; }
+
+        /* CONTENIDO PRINCIPAL */
+        .contacto-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .contacto-info {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .contacto-form {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: #222;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* REDES SOCIALES */
+        .redes-sociales {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .redes-sociales a {
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+
+        .redes-sociales a:hover {
+            transform: scale(1.1);
+        }
+
+        .redes-sociales img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        /* FORMULARIO */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            background: #222;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #444;
+        }
+
+        /* INFO DE CONTACTO */
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .info-item i {
+            font-size: 24px;
+            color: #555;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .info-item p {
+            margin: 0;
+            color: #555;
+        }
+
+        .info-item a {
+            color: #222;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .info-item a:hover {
+            color: #555;
+            text-decoration: underline;
+        }
+
+        /* MAPA */
+        .mapa-container {
+            margin-top: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .mapa-container iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .menu {
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .menu li {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .menu a {
+                display: block;
+                width: 90%;
+                margin: 0 auto;
+                padding: 12px 0;
+            }
+            
+            .contacto-container {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .redes-sociales img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- NAVEGACIÓN -->
+    <nav>
+        <ul class="menu">
+            <li><a href="inicio.html">Inicio</a></li>
+            <li><a href="colecciones.html">Colecciones</a></li>
+            <li><a href="tendencias.html">Tendencias</a></li>
+            <li><a href="colaboraciones.html">Colaboraciones</a></li>
+            <li><a href="lookbook.html">Lookbook</a></li>
+            <li><a href="contacto.html" class="active">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <h1>Contáctanos</h1>
+        
+        <div class="contacto-container">
+            <!-- INFORMACIÓN DE CONTACTO -->
+            <div class="contacto-info">
+                <h2>Información de Contacto</h2>
+                
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>Av. Moda 123, Col. Diseño<br>Ciudad de México, México</p>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <p><a href="tel:+525524218886">+52 55 2421 8886</a></p>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <p><a href="mailto:contacto@modaadela.com">contacto@modaadela.com</a></p>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <p>Lunes a Viernes: 9:00 - 18:00<br>Sábado: 10:00 - 14:00</p>
+                </div>
+                
+                <h3>Síguenos en redes</h3>
+                <div class="redes-sociales">
+                    <a href="https://wa.me/5524218886" target="_blank" title="WhatsApp"><img src="Recursos/whats.png" alt="WhatsApp"></a>
+                    <a href="https://www.instagram.com/adelaavila333?igsh=cDkxcDRoMW56b3Zw" target="_blank" title="Instagram"><img src="Recursos/instagram.png" alt="Instagram"></a>
+                    <a href="https://www.tiktok.com/@adelaavila333?_t=ZM-8v1HPR7B7Ys&_r=1" target="_blank" title="TikTok"><img src="Recursos/tiktok.png" alt="TikTok"></a>
+                    <a href="https://www.youtube.com/@adelaavila333" target="_blank" title="YouTube"><img src="Recursos/youtube.png" alt="YouTube"></a>
+                </div>
+                
+                <div class="mapa-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.888244552543!2d-99.16782692416438!3d19.426971040991835!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff3758e3a359%3A0xa6f8d4256f1a3c4a!2sPalacio%20de%20Bellas%20Artes!5e0!3m2!1ses-419!2smx!4v1712345678901!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+            
+            <!-- FORMULARIO DE CONTACTO (MODIFICADO PARA FORMSUBMIT) -->
+            <div class="contacto-form">
+                <h2>Envíanos un mensaje</h2>
+                <form action="https://formsubmit.co/uzielsanchez007@gmail.com" method="POST">
+                    <!-- Configuración de FormSubmit -->
+                    <input type="hidden" name="_next" value="https://tupagina.com/gracias.html"> <!-- Reemplaza con tu URL -->
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_subject" value="Nuevo mensaje desde el sitio web">
+                    <input type="hidden" name="_template" value="table">
+                    
+                    <div class="form-group">
+                        <label for="nombre">Nombre completo:</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono">Teléfono (opcional):</label>
+                        <input type="tel" id="telefono" name="telefono">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="asunto">Asunto:</label>
+                        <select id="asunto" name="asunto" required>
+                            <option value="" disabled selected>Selecciona un asunto</option>
+                            <option value="consulta">Consulta general</option>
+                            <option value="pedido">Información sobre pedidos</option>
+                            <option value="colaboracion">Oportunidades de colaboración</option>
+                            <option value="prensa">Prensa y medios</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje:</label>
+                        <textarea id="mensaje" name="mensaje" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
